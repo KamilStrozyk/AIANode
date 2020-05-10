@@ -9,7 +9,6 @@ router.get('/', (request, response) => {
         if (!request.session.cart) {
             request.session.cart = new Array
         }
-        console.log(request.session.cart);
 
         var db = client.db('products');
 
@@ -29,13 +28,15 @@ router.get('/cart', (request, response) => {
         if (!request.session.cart) {
             request.session.cart = new Array
         } else {
-            var cart = req.session.cart
+            var cart = request.session.cart
         }
         console.log(cart);
         var db = client.db('products');
         db.collection('products').find().toArray(function(err, result) {
             if (err) throw err;
-            response.render('cart', { 'products': result.filter(x => request.session.cart.includes(x)) });
+            var products = result.filter(x => cart.filter(y => y.localeCompare(x._id) === 0).length > 0);
+            console.log(products);
+            response.render('cart', { 'products': products });
         })
         client.close();
     })
@@ -51,6 +52,17 @@ router.post('/add', (request, response) => {
         request.session.cart.push(id);
     }
     response.redirect('/');
+});
+
+router.post('/remove', (request, response) => {
+    if (!request.session.cart) {
+        request.session.cart = new Array
+    }
+    let id = request.body._id;
+    if (request.session.cart.filter(x => x.localeCompare(id) === 0).length > 0) {
+        request.session.cart.pop(id);
+    }
+    response.redirect('/cart');
 });
 
 module.exports = router;
