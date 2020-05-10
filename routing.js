@@ -30,13 +30,16 @@ router.get('/cart', (request, response) => {
         } else {
             var cart = request.session.cart
         }
-        console.log(cart);
         var db = client.db('products');
         db.collection('products').find().toArray(function(err, result) {
             if (err) throw err;
-            var products = result.filter(x => cart.filter(y => y.localeCompare(x._id) === 0).length > 0);
-            console.log(products);
-            response.render('cart', { 'products': products });
+            try {
+                var products = result.filter(x => cart.filter(y => y.localeCompare(x._id) === 0).length > 0);
+                console.log(products);
+                response.render('cart', { 'products': products });
+            } catch (error) {
+                response.render('cart', { 'products': [] });
+            }
         })
         client.close();
     })
@@ -60,7 +63,7 @@ router.post('/remove', (request, response) => {
     }
     let id = request.body._id;
     if (request.session.cart.filter(x => x.localeCompare(id) === 0).length > 0) {
-        request.session.cart.pop(id);
+        request.session.cart.splice(request.session.cart.indexOf(id), 1);
     }
     response.redirect('/cart');
 });

@@ -47,12 +47,12 @@
 
                                     <%= products[i].Price%>
                                 </td>
-                                <td><button type="button" onclick="removeFromCart('<%=JSON.stringify(products[i]._id)%>')" class="btn btn-danger btn-sm btn-block ">Remove from cart</button></td>
+                                <td><button type="button" onclick="removeFromCart('<%=JSON.stringify(products[i])%>')" class="btn btn-danger btn-sm btn-block ">Remove from cart</button></td>
                             </tr>
                             <%}%>
                     </tbody>
             </table>
-            <button type="button" class="btn btn-success btn-lg btn-block" onclick="buy('<%=JSON.stringify(products.map(x => x._id))%>')">Buy</button>
+            <button type="button" class="btn btn-success btn-lg btn-block" onclick="buy('<%=JSON.stringify(products)%>')">Buy</button>
             </div>
 
     </main>
@@ -63,15 +63,18 @@
     </footer>
 </body>
 <script>
-    function removeFromCart(id) {
+    function removeFromCart(product) {
+        console.log(product);
         var req = new XMLHttpRequest();
         req.open('POST', '/remove');
-        req.send(id);
+        req.setRequestHeader('content-type', 'application/json')
+        req.send(product);
     }
 
-    function buy(ids) {
+    function buy(products) {
         var req = new XMLHttpRequest();
         req.open('POST', '/buy');
-        req.send(ids);
+        req.setRequestHeader('content-type', 'application/json')
+        req.send(products);
     }
 </script>
