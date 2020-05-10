@@ -1,17 +1,20 @@
 const express = require('express')
-const app = express()
 var session=require('express-session')
 const routing = require('./routing');
 var bodyParser = require('body-parser');
+const ejs=require('ejs')
+
 const port = 3000
 
+const app = express() 
+app.set('view engine','ejs');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:false}))
 app.use((request, response, next) => {
     console.log(`${request.method} ${request.url}: ${new Date()}`);
     next();
 })
 
-app.use(bodyParser.json());
-app.set('view engine', 'ejs');
 
 app.use(session({
     secret: 'somebodyoncetoldmethathsworldsgonnarollme',
@@ -56,7 +59,6 @@ MongoClient.connect('mongodb://localhost:27017/', function(err, client) {
                     "Price": "4500"
                 }
             ]);
-            console.log(result);
         };
 
     })

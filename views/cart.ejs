@@ -47,12 +47,13 @@
 
                                     <%= products[i].Price%>
                                 </td>
-                                <td><button type="button" onclick="removeFromCart('<%=JSON.stringify(products[i])%>')" class="btn btn-danger btn-sm btn-block ">Remove from cart</button></td>
+                                <td><button type="submit" onclick="removeFromCart('<%=JSON.stringify(products[i])%>')" class="btn btn-danger btn-sm btn-block ">Remove from cart</button></td>
                             </tr>
                             <%}%>
                     </tbody>
             </table>
-            <button type="button" class="btn btn-success btn-lg btn-block" onclick="buy('<%=JSON.stringify(products)%>')">Buy</button>
+            <button type="submit" class="btn btn-secondary btn-lg btn-block" onclick="clear()">Clear cart</button>
+            <button type="submit" class="btn btn-success btn-lg btn-block" onclick="buy('<%=JSON.stringify(products)%>')">Buy</button>
             </div>
 
     </main>
@@ -64,15 +65,43 @@
 </body>
 <script>
     function removeFromCart(product) {
-        console.log(product);
         var req = new XMLHttpRequest();
+        req.onreadystatechange = () => {
+            window.location = "cart"
+        }
         req.open('POST', '/remove');
         req.setRequestHeader('content-type', 'application/json')
         req.send(product);
     }
 
+    function clear() {
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = () => {
+            window.location = "cart"
+        }
+        req.open('POST', '/clear');
+        req.setRequestHeader('content-type', 'application/json')
+        req.send("");
+    }
+
     function buy(products) {
         var req = new XMLHttpRequest();
+        req.onreadystatechange = () => {
+            if (req.readyState === XMLHttpRequest.DONE) {
+
+                if (req.status === 409) {
+                    window.location = "cart"
+                    alert("Transaction cancelled- Some of products in cart are no longer available")
+                } else if (req.status === 200) {
+                    alert("Transaction complete")
+                    window.location = "/"
+                } else {
+                    alert("Unknown error:", req.status)
+                    window.location = "cart"
+                }
+
+            }
+        }
         req.open('POST', '/buy');
         req.setRequestHeader('content-type', 'application/json')
         req.send(products);

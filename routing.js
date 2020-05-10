@@ -35,7 +35,6 @@ router.get('/cart', (request, response) => {
             if (err) throw err;
             try {
                 var products = result.filter(x => cart.filter(y => y.localeCompare(x._id) === 0).length > 0);
-                console.log(products);
                 response.render('cart', { 'products': products });
             } catch (error) {
                 response.render('cart', { 'products': [] });
@@ -54,7 +53,7 @@ router.post('/add', (request, response) => {
     if (request.session.cart == 0 || request.session.cart.filter(x => x.localeCompare(id) === 0).length === 0) {
         request.session.cart.push(id);
     }
-    response.redirect('/');
+    response.redirect('/', 200);
 });
 
 router.post('/remove', (request, response) => {
@@ -65,7 +64,25 @@ router.post('/remove', (request, response) => {
     if (request.session.cart.filter(x => x.localeCompare(id) === 0).length > 0) {
         request.session.cart.splice(request.session.cart.indexOf(id), 1);
     }
-    response.redirect('/cart');
+    response.redirect('/cart', 200);
+});
+
+router.post('/buy', (request, response) => {
+    if (!request.session.cart) {
+        request.session.cart = new Array
+    }
+    console.log(request.body);
+    let isBought = true;
+
+    if (isBought === true)
+        response.redirect('/', 200);
+    else
+        response.redirect('/cart', 409);
+});
+
+router.post('/clear', (request, response) => {
+    request.session.cart = new Array;
+    response.redirect('/cart', 200);
 });
 
 module.exports = router;
