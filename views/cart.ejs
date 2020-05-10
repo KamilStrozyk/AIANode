@@ -52,7 +52,7 @@
                             <%}%>
                     </tbody>
             </table>
-            <button type="submit" class="btn btn-secondary btn-lg btn-block" onclick="clear()">Clear cart</button>
+            <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="clearCart()">Clear cart</button>
             <button type="submit" class="btn btn-success btn-lg btn-block" onclick="buy('<%=JSON.stringify(products)%>')">Buy</button>
             </div>
 
@@ -67,21 +67,24 @@
     function removeFromCart(product) {
         var req = new XMLHttpRequest();
         req.onreadystatechange = () => {
-            window.location = "cart"
+            if (req.readyState === XMLHttpRequest.DONE) {
+                window.location = "cart"
+            }
         }
         req.open('POST', '/remove');
         req.setRequestHeader('content-type', 'application/json')
         req.send(product);
     }
 
-    function clear() {
+    function clearCart() {
         var req = new XMLHttpRequest();
         req.onreadystatechange = () => {
-            window.location = "cart"
+            if (req.readyState === XMLHttpRequest.DONE) {
+                window.location = "cart"
+            }
         }
         req.open('POST', '/clear');
-        req.setRequestHeader('content-type', 'application/json')
-        req.send("");
+        req.send();
     }
 
     function buy(products) {
