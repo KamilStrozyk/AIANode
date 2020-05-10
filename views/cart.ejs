@@ -17,19 +17,61 @@
 
 
         <div class="container ">
-            Your shopping cart
-        </div>
 
-        <div class="container ">
-            <table class="table-dark ">
-                <td></td>
+
+            <table class="table">
+                <div class="btn btn-lg btn-block"> Your shopping cart</button>
+                    <thead class="thead-dark">
+
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Brand</th>
+                            <th scope="col">Model</th>
+                            <th scope="col">Price</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%for(var i=0;i<products.length;i++){%>
+                            <tr>
+                                <th scope="row">
+                                    <%= i+1%>
+                                </th>
+                                <td>
+                                    <%= products[i].Brand%>
+                                </td>
+                                <td>
+                                    <%= products[i].Model%>
+                                </td>
+                                <td>
+
+                                    <%= products[i].Price%>
+                                </td>
+                                <td><button type="button" onclick="removeFromCart('<%=JSON.stringify(products[i]._id)%>')" class="btn btn-danger btn-sm btn-block ">Remove from cart</button></td>
+                            </tr>
+                            <%}%>
+                    </tbody>
             </table>
-
+            <button type="button" class="btn btn-success btn-lg btn-block" onclick="buy('<%=JSON.stringify(products.map(x => x._id))%>')">Buy</button>
+            </div>
 
     </main>
     <footer class="footer mt-auto py-3">
         <div class="container">
-            <span class="text-muted">Sample footer.</span>
+            <span class="text-muted">Guitar store, 2020</span>
         </div>
     </footer>
 </body>
+<script>
+    function removeFromCart(id) {
+        var req = new XMLHttpRequest();
+        req.open('POST', '/remove');
+        req.send(id);
+    }
+
+    function buy(ids) {
+        var req = new XMLHttpRequest();
+        req.open('POST', '/buy');
+        req.send(ids);
+    }
+</script>

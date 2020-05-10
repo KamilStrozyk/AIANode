@@ -50,17 +50,25 @@
                             <td>
                                 <%= products[i].Price%>
                             </td>
-                            <td><button type="button" class="btn ">Add to cart</button></td>
+                            <td><button type="button" onclick="addToCart('<%=JSON.stringify(products[i])%>')" class="btn btn-dark btn-sm btn-block ">Add to cart</button></td>
                         </tr>
                         <%}%>
                 </tbody>
             </table>
 
-
+        </div>
     </main>
     <footer class="footer mt-auto py-3">
         <div class="container">
-            <span class="text-muted">Sample footer.</span>
-        </div>
+            <span class="text-muted">Guitar store, 2020</span>
+
     </footer>
 </body>
+<script>
+    function addToCart(products) {
+        var req = new XMLHttpRequest();
+        req.open('POST', '/add');
+        req.setRequestHeader('content-type', 'application/json')
+        req.send(products);
+    }
+</script>

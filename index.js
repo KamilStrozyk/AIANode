@@ -1,17 +1,25 @@
 const express = require('express')
 const app = express()
-const port = 3000
-var bodyParser = require('body-parser');
+var session=require('express-session')
 const routing = require('./routing');
+var bodyParser = require('body-parser');
+const port = 3000
 
 app.use((request, response, next) => {
     console.log(`${request.method} ${request.url}: ${new Date()}`);
     next();
 })
 
-app.use('/', routing);
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
+
+app.use(session({
+    secret: 'somebodyoncetoldmethathsworldsgonnarollme',
+    resave: false,
+    saveUninitialized: true,
+}))
+
+app.use('/', routing);
 
 var MongoClient = require('mongodb').MongoClient
 
