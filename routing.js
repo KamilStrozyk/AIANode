@@ -74,7 +74,7 @@ router.post('/buy', (request, response) => {
     var cart = request.session.cart;
 
     var MongoClient = require('mongodb').MongoClient;
-    MongoClient.connect('mongodb://localhost:27017/', async function(err, client) {
+    MongoClient.connect('mongodb://localhost:27017/', function(err, client) {
         if (err) throw err;
 
         var db = client.db('products');
@@ -95,19 +95,23 @@ router.post('/buy', (request, response) => {
             return bought;
         }
 
-        let isBought = await check();
+        let isBought = check().then(x => {
 
-        if (isBought === true) {
-            for (let i = 0; i < request.session.cart.length; i++) {
-                id = request.session.cart[i];
-                db.collection('products').deleteOne({ _id: require('mongodb').ObjectID(id) });
+            if (x === true) {
+                for (let i = 0; i < request.session.cart.length; i++) {
+                    id = request.session.cart[i];
+                    db.collection('products').deleteOne({ _id: require('mongodb').ObjectID(id) });
+                }
             }
-            response.redirect('/delete', 200);
-        } else
-            response.redirect('/cart', 409);
+        }).then(x => {
+            if (x === true) {
+                response.redirect('/', 200);
+            } else
+                response.redirect('/cart', 409);
 
-        request.session.cart = new Array;
-        client.close();
+            request.session.cart = new Array;
+            client.close();
+        })
     });
 });
 
