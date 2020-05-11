@@ -71,14 +71,46 @@ router.post('/buy', (request, response) => {
     if (!request.session.cart) {
         request.session.cart = new Array
     }
-    console.log(request.body);
-    let isBought = true;
+    var cart = request.session.cart;
 
-    if (isBought === true)
-        response.redirect('/', 200);
-    else
-        response.redirect('/cart', 409);
+    var MongoClient = require('mongodb').MongoClient;
+    MongoClient.connect('mongodb://localhost:27017/', async function(err, client) {
+        if (err) throw err;
+
+        var db = client.db('products');
+
+        async function check() {
+            let bought = true;
+            await db.collection('products').find().toArray(function(err, result) {
+                    if (err) throw err;
+                    for (let i = 0; i < cart.length; i++) {
+                        let x = cart[i];
+                        if (result.filter(y => x.localeCompare(y._id) === 0).length === 0) {
+                            bought = false;
+                            // console.log("bought inside loop:", bought);
+                        }
+                    }
+                })
+                // console.log("bought inside check:", bought);
+            return bought;
+        }
+
+        let isBought = await check();
+
+        if (isBought === true) {
+            for (let i = 0; i < request.session.cart.length; i++) {
+                id = request.session.cart[i];
+                db.collection('products').deleteOne({ _id: require('mongodb').ObjectID(id) });
+            }
+            response.redirect('/delete', 200);
+        } else
+            response.redirect('/cart', 409);
+
+        request.session.cart = new Array;
+        client.close();
+    });
 });
+
 
 router.post('/clear', (request, response) => {
     request.session.cart = new Array;
